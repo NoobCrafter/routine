@@ -1,0 +1,11 @@
+{
+  "name": "Routine Gaming Core v3",
+  "short_name": "CoreV3",
+  "description": "Dein Gaming-Routine-Manager",
+  "id": "/index.html",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#020b1a",
+  "theme_color": "#00d4ff",
+  "icons": []
+}

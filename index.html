@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Routine Gaming Core v3 - Deutsch</title>
+    
+    <link rel="manifest" href="manifest.json">
+    
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+</head>
+<body class="gaming-dark">
+
+    <div class="main-wrapper">
+        <div id="login-screen" class="glass-box">
+            <h1 class="gaming-title">KERN<span>v3</span></h1>
+            <input type="text" id="username" placeholder="OPERATOR NAME">
+            <input type="email" id="email" placeholder="E-MAIL ADRESSE">
+            <input type="password" id="password" placeholder="SICHERHEITSSCHLÜSSEL">
+            <button class="btn-mega" onclick="handleAuth()">INITIALISIEREN</button>
+        </div>
+
+        <div id="app-screen" style="display: none;">
+            <div class="dashboard-header">
+                <div class="currency-display">🪙 <span id="coin-count">0</span></div>
+                <div class="nav-cluster">
+                    <button class="nav-btn" onclick="openModal('shop-modal')">🛒 SHOP</button>
+                    <button class="nav-btn" onclick="openModal('leaderboard-modal')">🏆 RANGLISTE</button>
+                    <button class="nav-btn" onclick="openModal('settings-modal')">⚙️ EINSTELLUNGEN</button>
+                    <button class="nav-btn" onclick="toggleTheme()">🌓 MODUS</button>
+                </div>
+            </div>
+
+            <div class="pet-hero-card">
+                <div id="pet-emoji" class="floating">🥚</div>
+                <div class="pet-details">
+                    <h2 id="display-name">SPIELER</h2>
+                    <div class="level-indicator">RANG <span id="pet-level">1</span></div>
+                    <div class="xp-container-huge"><div id="xp-fill"></div></div>
+                </div>
+            </div>
+
+            <div class="day-scroll">
+                <button class="day-card active" onclick="setDay('Mo', this)">MON</button>
+                <button class="day-card" onclick="setDay('Di', this)">DIE</button>
+                <button class="day-card" onclick="setDay('Mi', this)">MIT</button>
+                <button class="day-card" onclick="setDay('Do', this)">DON</button>
+                <button class="day-card" onclick="setDay('Fr', this)">FRE</button>
+                <button class="day-card" onclick="setDay('Sa', this)">SAM</button>
+                <button class="day-card" onclick="setDay('So', this)">SON</button>
+            </div>
+
+            <div class="mission-control-huge">
+                <input type="text" id="task-input" placeholder="EINGABE: NEUE MISSION...">
+                <button class="btn-mega" onclick="addTask()">MISSION STARTEN</button>
+            </div>
+
+            <ul id="task-list"></ul>
+            
+            <button onclick="logout()" class="btn-exit">SITZUNG BEENDEN</button>
+        </div>
+    </div>
+
+    <div id="shop-modal" class="modal">
+        <div class="modal-content shop-layout">
+            <h2 class="gaming-title">AUSRÜSTUNG<span>SHOP</span></h2>
+            <div class="shop-scroll">
+                <div class="shop-item"><span>🔴 NEON ROT</span><button onclick="buyItem('color', '#ff004c', 150)">150 🪙</button></div>
+                <div class="shop-item"><span>🟢 GIFT GRÜN</span><button onclick="buyItem('color', '#39ff14', 200)">200 🪙</button></div>
+                <div class="shop-item"><span>🟡 CYBER GOLD</span><button onclick="buyItem('color', '#ffcc00', 300)">300 🪙</button></div>
+                <div class="shop-item"><span>🎖️ 'LEGENDE' TITEL</span><button onclick="buyItem('title', 'LEGENDE', 500)">500 🪙</button></div>
+                <div class="shop-item"><span>🔥 'OVERLORD' TITEL</span><button onclick="buyItem('title', 'OVERLORD', 1000)">1000 🪙</button></div>
+            </div>
+            <button class="btn-mega" onclick="closeModal('shop-modal')">SCHLIESSEN</button>
+        </div>
+    </div>
+
+    <div id="leaderboard-modal" class="modal">
+        <div class="modal-content">
+            <h2 class="gaming-title">TOP<span>SPIELER</span></h2>
+            <div id="leaderboard-list"></div>
+            <button class="btn-mega" onclick="closeModal('leaderboard-modal')">ZURÜCK</button>
+        </div>
+    </div>
+
+    <div id="settings-modal" class="modal">
+        <div class="modal-content">
+            <h2 class="gaming-title">SYSTEM<span>KONFIG</span></h2>
+            <p id="user-email-display" style="color: var(--g-blue); font-size: 0.9rem;"></p>
+            <input type="password" id="new-password" placeholder="NEUES PASSWORT">
+            <button class="btn-mega" onclick="changePassword()">KEY AKTUALISIEREN</button>
+            <button class="btn-mega" style="background:#444;" onclick="closeModal('settings-modal')">ABBRECHEN</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
