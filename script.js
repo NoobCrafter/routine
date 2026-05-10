@@ -1,38 +1,41 @@
-// --- 1. INITIALISIERUNG & SPEICHER ---
 let userData = {
     username: "",
     coins: 0,
     level: 1,
-    xp: 0,
-    tasks: [],
-    currentDay: "Mo"
+    xp: 0
 };
 
-// Lädt Daten beim Start der Seite
-window.onload = function() {
-    const savedData = localStorage.getItem('routineGamingData');
-    if (savedData) {
-        userData = JSON.parse(savedData);
-        renderFromStorage();
+// Check LocalStorage
+window.onload = () => {
+    const saved = localStorage.getItem('routineGamingData');
+    if (saved) {
+        userData = JSON.parse(saved);
+        showDashboard();
     }
 };
 
-function saveToDisk() {
-    localStorage.setItem('routineGamingData', JSON.stringify(userData));
+function handleAuth() {
+    const user = document.getElementById('username');
+    const pass = document.getElementById('password');
+    const error = document.getElementById('error-msg');
+    const box = document.querySelector('.glass-box');
+
+    if (!user.value || !pass.value) {
+        box.classList.add('error-shake');
+        error.style.display = "block";
+        error.innerText = "Error: Access Denied";
+        setTimeout(() => box.classList.remove('error-shake'), 400);
+    } else {
+        userData.username = user.value;
+        showDashboard();
+        save();
+    }
 }
 
-// --- 2. AUTH & UI ---
-function handleAuth() {
-    const userField = document.getElementById('username').value;
-    if (userField) {
-        userData.username = userField;
-        updateUI();
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('app-screen').style.display = 'block';
-        saveToDisk();
-    } else {
-        alert("Bitte Operator-Name eingeben!");
-    }
+function showDashboard() {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app-screen').style.display = 'block';
+    updateUI();
 }
 
 function updateUI() {
@@ -40,119 +43,39 @@ function updateUI() {
     document.getElementById('coin-count').innerText = userData.coins;
     document.getElementById('pet-level').innerText = userData.level;
     document.getElementById('xp-fill').style.width = userData.xp + "%";
-    checkPetEvolution();
 }
 
-function renderFromStorage() {
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('app-screen').style.display = 'block';
-    updateUI();
-}
-
-// --- 3. MISSIONEN MIT 5 MINUTEN SPERRE ---
 function addTask() {
     const input = document.getElementById('task-input');
-    if (input.value.trim() !== "") {
-        const taskList = document.getElementById('task-list');
-        const taskId = Date.now(); 
-        const li = document.createElement('li');
-        li.id = `task-${taskId}`;
-        
-        li.innerHTML = `
-            <div class="task-item" style="background: rgba(0,0,0,0.3); padding: 15px; margin-bottom: 10px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid #ffcc00;">
-                <div>
-                    <strong style="display: block; color: white;">${input.value}</strong>
-                    <small id="timer-${taskId}" style="color: #ffcc00;">Sperre läuft...</small>
-                </div>
-                <button id="btn-${taskId}" disabled style="background: #444; color: #888; border: none; padding: 10px 15px; border-radius: 5px;">WARTEN...</button>
-            </div>
-        `;
-        taskList.appendChild(li);
-        
-        // Timer starten: 300 Sekunden sind 5 Minuten
-        startMissionTimer(taskId, 300); 
-        input.value = "";
-    }
+    if (!input.value) return;
+
+    const list = document.getElementById('task-list');
+    const id = Date.now();
+    const li = document.createElement('li');
+    li.id = `task-${id}`;
+    li.innerHTML = `
+        <span style="font-family: 'Rajdhani'; font-weight: bold;">${input.value}</span>
+        <button class="btn-done" onclick="completeTask(${id})">DONE</button>
+    `;
+    list.appendChild(li);
+    input.value = "";
 }
 
-function startMissionTimer(taskId, seconds) {
-    let timeLeft = seconds;
-    const timerDisplay = document.getElementById(`timer-${taskId}`);
-    const actionBtn = document.getElementById(`btn-${taskId}`);
-
-    const interval = setInterval(() => {
-        timeLeft--;
-        let mins = Math.floor(timeLeft / 60);
-        let secs = timeLeft % 60;
-        timerDisplay.innerText = `Sperre: ${mins}:${secs < 10 ? '0' : ''}${secs}`;
-
-        if (timeLeft <= 0) {
-            clearInterval(interval);
-            timerDisplay.innerText = "MISSION BEREIT!";
-            timerDisplay.style.color = "#39ff14";
-            actionBtn.innerText = "ERLEDIGT";
-            actionBtn.disabled = false;
-            actionBtn.style.background = "#00d4ff";
-            actionBtn.style.color = "white";
-            actionBtn.style.cursor = "pointer";
-            actionBtn.onclick = () => completeTask(taskId);
-        }
-    }, 1000);
-}
-
-function completeTask(taskId) {
-    userData.coins += 20;
-    userData.xp += 25;
-    
+function completeTask(id) {
+    userData.coins += 25;
+    userData.xp += 20;
     if (userData.xp >= 100) {
         userData.level++;
         userData.xp = 0;
-        alert("LEVEL UP! Dein Core entwickelt sich!");
     }
-    
-    const taskElement = document.getElementById(`task-${taskId}`);
-    if(taskElement) taskElement.remove();
+    document.getElementById(`task-${id}`).remove();
     updateUI();
-    saveToDisk();
+    save();
 }
 
-// --- 4. NAVIGATION, SHOP & EVOLUTION ---
-function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-
-function setDay(day, btn) {
-    userData.currentDay = day;
-    document.querySelectorAll('.day-card').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    saveToDisk();
-}
-
-function buyItem(type, value, price) {
-    if (userData.coins >= price) {
-        userData.coins -= price;
-        alert("Ausrüstung erhalten!");
-        if(type === 'color') document.documentElement.style.setProperty('--g-blue', value);
-        updateUI();
-        saveToDisk();
-    } else {
-        alert("Nicht genug Coins, Operator!");
-    }
-}
-
-function checkPetEvolution() {
-    const petElement = document.getElementById('pet-emoji');
-    if (userData.level >= 5 && userData.level < 10) {
-        petElement.innerText = "🐣";
-    } else if (userData.level >= 10) {
-        petElement.innerText = "🤖";
-    } else {
-        petElement.innerText = "🥚";
-    }
-}
+function save() { localStorage.setItem('routineGamingData', JSON.stringify(userData)); }
 
 function logout() {
-    if(confirm("Sitzung beenden? Alle Daten werden gelöscht!")) {
-        localStorage.removeItem('routineGamingData');
-        location.reload();
-    }
-}
+    localStorage.removeItem('routineGamingData');
+    location.reload();
+}44
